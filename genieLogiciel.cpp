@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <string_view>
 //#include <Markup.h>
 
     using namespace std;
@@ -17,25 +18,32 @@
         {
             
             string contenu;  // déclaration d'une chaîne qui contiendra la ligne lue
-            string abstract("Abstract");
+            
             string resume;
             string titre;
             string auteur;
             char test;
-            int a = 0;
+            int a ;
             getline(fichier, contenu);  // on met dans "contenu" la ligne
             
-            /*test = contenu.at(contenu.length() - 1);
-            while (test != '\n')//, a < 1000)
-            {
-                auteur += contenu;
-                a++;
-                getline(fichier, contenu);
-                test = contenu.at(contenu.length() - 1);
-            }*/
             
-            titre = contenu;
-            getline(fichier, contenu);
+            for (a=0;contenu.find_first_not_of("\n") !=  string::npos  && a < 3;a++)
+            {
+                if(contenu.find("Florian") == string::npos)
+                {
+                    cout<<"contenu a la recherche du titre : " + contenu <<endl;
+                    titre += contenu;
+                    getline(fichier, contenu);
+                }
+                else
+                {
+                    a=3;    
+                }
+                
+            }
+            
+            //titre = contenu;
+            //getline(fichier, contenu);
             while (contenu.find("Abstract") == string::npos &&  a < 1000)
             {
                 auteur += contenu;
@@ -65,7 +73,7 @@
                 fichier << "les auteurs : " << auteur << endl;
                 fichier << "le resume : " << resume << endl;
                 fichier.close();
-                cout << "fin du programme";
+                cout << "fin du programme"<<"\n";
             }
             
             
