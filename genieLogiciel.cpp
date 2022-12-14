@@ -5,10 +5,11 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+//#include <Markup.h>
 
     using namespace std;
      
-    int main()
+    int main()//int argc, char* argv[])
     {
         ifstream fichier("Boudin-Torres-2006.txt", ios::in);  // on ouvre le fichier en lecture
 
@@ -20,13 +21,17 @@
             string resume;
             string titre;
             string auteur;
+            char test;
             int a = 0;
             getline(fichier, contenu);  // on met dans "contenu" la ligne
-            /*while (contenu.find("Abstract") == string::npos && a < 1000)
+            
+            /*test = contenu.at(contenu.length() - 1);
+            while (test != '\n')//, a < 1000)
             {
                 auteur += contenu;
                 a++;
                 getline(fichier, contenu);
+                test = contenu.at(contenu.length() - 1);
             }*/
             
             titre = contenu;
@@ -51,10 +56,19 @@
 
 
             }
+
+            if (true)
+            {
+                ofstream fichier;
+                fichier.open("log.txt", ios::out);
+                fichier << "le titre : " << titre << endl;
+                fichier << "les auteurs : " << auteur << endl;
+                fichier << "le resume : " << resume << endl;
+                fichier.close();
+                cout << "fin du programme";
+            }
             
-            cout << "le titre : " << titre << endl;
-            cout << "les auteurs : " << auteur << endl;
-            cout << "le resume : " << resume << endl;
+            
         }
         else
             cerr << "Impossible d'ouvrir le fichier !" << endl;
