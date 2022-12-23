@@ -13,15 +13,16 @@ using std::endl; using std::vector;
 char * fichierDansDossier()
 {
     int chosenOne;
+    char* fileChosen;
     vector<char *> tabFichier;
     ofstream fichier;
-    fichier.open("listFichier.txt", ios::out);
     DIR *dir; struct dirent *diread;
     vector<char *> files;
 
     if ((dir = opendir("/home/tomas/Bureau/genieLog/GenieLogicielParser/CORPUS_TRAIN")) != nullptr) {
         while ((diread = readdir(dir)) != nullptr) {
             files.push_back(diread->d_name);
+           //cout<<diread->d_name<<endl;
         }
         closedir (dir);
     } else {
@@ -29,29 +30,27 @@ char * fichierDansDossier()
         return NULL;
     }
 
-    for (auto file : files) 
+    for(int i=0; i < files.size();i++)
     {
-        tabFichier.push_back(file);
-    }
-
-    fichier.close();
-    for(int i=0; i < tabFichier.size();i++)
-    {
-        cout<<i<<" : "<<tabFichier[i] << endl;
+        cout<<i<<" : "<<files[i] << endl;
     }
     cout << "choose your file by entering the number"<<endl;
     cin >> chosenOne;
 
-    if(chosenOne>=0 && chosenOne < tabFichier.size())
+    if(chosenOne>=0 && chosenOne < files.size())
     {
-        cout << "you choose : " << tabFichier[chosenOne] << endl;
+        cout << "you choose : " << files[chosenOne] << endl;
+        fileChosen = files[chosenOne];
     }
 
-    return tabFichier[chosenOne];
+    fichier.close();
+    
+
+    return fileChosen;
 }
 
     
-void option (string s, string resume,string titre,string auteur,string reference,string nomFichier){
+void option (string s, string resume,string titre,string auteur,string reference,string nomFichier,string conclusion,string discussion,string introduction,string corps){
  if (s=="-t"){
  	ofstream fichier;
  	fichier.open("log.txt");
@@ -61,7 +60,11 @@ void option (string s, string resume,string titre,string auteur,string reference
  	 fichier << "le titre : " << titre << endl;
                 fichier << "les auteurs : " << auteur << endl;
                 fichier << "le resume : " << resume << endl;
+                fichier << "l'introduction : "<<introduction<<endl;
+                fichier << "le corps : "<<corps<<endl;
                 fichier << "les references : " << reference << endl;
+                fichier << "les discussions : " << discussion << endl;
+                fichier << "les conclusions : " << conclusion << endl;
                 fichier.close();
                 cout << "fin du programme";
  
@@ -74,11 +77,16 @@ void option (string s, string resume,string titre,string auteur,string reference
  
  ofstream fichier;
  fichier.open("log.xml");
+ fichier<< "<?xml version='1.0' encoding='utf-8'?>"<<endl;
  fichier<< "<article>"<<endl;
 	fichier <<" <preamble> Le nom du fichier "<<nomFichier<<" </preamble>"<<endl;
 	fichier <<"<titre> "<< titre << " </titre>"<<endl;
 	fichier <<"<auteur> La section auteurs et leur adresse"<< auteur<<" </auteur>"<<endl;
-	fichier <<"<abstract> resume article" << resume<< "abstract>" <<endl;
+	fichier <<"<abstract> resume article" << resume<< "</abstract>" <<endl;
+    fichier <<"<introduction> introduction article" << introduction<< "</introduction>" <<endl;
+    fichier <<" <corps> Le corps "<<corps<<" </corps>"<<endl;
+    fichier <<" <conclusion> La conclusion "<<conclusion<<" </conclusion>"<<endl;
+    fichier <<" <discussion> La discussion "<<discussion<<" </discussion>"<<endl;
 	fichier <<"<biblio> Les references graphiques papier" <<reference<<"</biblio>" <<endl;
        fichier <<	"</article> " ;
  
@@ -91,7 +99,8 @@ void option (string s, string resume,string titre,string auteur,string reference
  int parseur(string s , char * fileName){
  
         ifstream fichier(fileName, ios::in);  // on ouvre le fichier en lecture
-
+       // cout << fileName<<endl;
+        //cout << fichier<<endl;
         if (fichier)  // si l'ouverture a réussi
         {
             
@@ -102,6 +111,10 @@ void option (string s, string resume,string titre,string auteur,string reference
             string auteur;
             string reference;
             string nomFichier;
+            string introduction;
+            string corps;
+            string discussion;
+            string conclusion;
             int a = 0;
             
             nomFichier=fileName;
@@ -109,25 +122,79 @@ void option (string s, string resume,string titre,string auteur,string reference
             
             titre = contenu;
             getline(fichier, contenu);
-            while (contenu.find("Abstract") == string::npos &&  a < 1000)
+            while (contenu.find("Abstract") == string::npos && a < 20)
             {
                 auteur += contenu;
                 a++;
                 getline(fichier, contenu);
             }
+            a=0;
             if (contenu.find("Abstract") != string::npos) {
                 getline(fichier, contenu);
-                while (contenu.find("Introduction") == string::npos) {
+                while (contenu.find("Introduction") == string::npos && a < 100) {
 
                     resume += contenu;
                     getline(fichier, contenu);
+                    a++;
 
                 }
+            }
+            a=0;
+            while (contenu.find("Introduction") == string::npos && a < 100)
+            {
                 
+                getline(fichier, contenu);
+            }
+            if (contenu.find("Introduction") != string::npos) 
+            {
+                getline(fichier, contenu);
                 
+                while (contenu.find("2 ") == string::npos && contenu.find("2.") == string::npos && a < 1000)
+                {
+                    a++;
+                    introduction += contenu;
+                    getline(fichier, contenu);
+
+                }
+            }
+            a=0;
+
                 
+            while (contenu.find("Conclusions") == string::npos && contenu.find("Conclusion") == string::npos && contenu.find("Discussion") == string::npos&& !fichier.eof())
+            {
+                corps += contenu;
+                getline(fichier, contenu);
+            }
+            if (contenu.find("Conclusions") != string::npos || contenu.find("Conclusion") != string::npos) 
+            {
+                getline(fichier, contenu);
+               // cout << "je detecte la conclusion"<<endl;
+                while (contenu.find("Acknowledgments") == string::npos && contenu.find("References") == string::npos && a < 100)
+                {
+                    a++;
+                    conclusion += contenu;
+                    getline(fichier, contenu);
+
+                }
+            }
+            
+            if (contenu.find("Discussion") != string::npos) 
+            {
+                getline(fichier, contenu);
+               // cout << "je detecte la conclusion"<<endl;
+                while (contenu.find("Acknowledgments") == string::npos && contenu.find("References") == string::npos && a < 100)
+                {
+                    a++;
+                    discussion += contenu;
+                    getline(fichier, contenu);
+
+                }
+            }
+
+
+
                 ///////
-                 while (contenu.find("References") == string::npos )
+            while (contenu.find("References") == string::npos  && !fichier.eof())
             {
            
                 getline(fichier, contenu);
@@ -140,30 +207,30 @@ void option (string s, string resume,string titre,string auteur,string reference
                     getline(fichier, contenu);
 
                 }
-                }
-                
-                
-                
-                
-                
-                fichier.close();  // on ferme le fichier
-                
-                option(s, resume, titre, auteur,reference ,nomFichier);
-
-
-
-
             }
-            
-        else
-            cerr << "Impossible d'ouvrir le fichier !" << endl;
+                
+                
+                
+                
+                
+            fichier.close();  // on ferme le fichier
+                
+            option(s, resume, titre, auteur,reference ,nomFichier,conclusion,discussion,introduction,corps);
+        
 
         
+    
+    
+ 
     }
+    else
+        cerr << "Impossible d'ouvrir le fichier !" << endl;
+
     return 0;
  }
+ 
  int main(){
     
- 	parseur("-t",fichierDansDossier());
+ 	parseur("-x",fichierDansDossier());
  	return 0;
  }
