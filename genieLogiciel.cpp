@@ -1,49 +1,115 @@
-// genieLogiciel.cpp : Ce fichier contient la fonction 'main'. L'exécution du programme commence et se termine à cet endroit.
-//
-
 
 #include <iostream>
 #include <fstream>
+#include <vector>
+#include <dirent.h>
 #include <string>
-#include <string_view>
-//#include <Markup.h>
+#include <filesystem>
 
-    using namespace std;
-     
-    int main()//int argc, char* argv[])
+using namespace std;
+using std::cout; using std::cin;
+using std::endl; using std::vector;
+    
+int fichierDansDossier()
+{
+    
+    vector<char *> tabFichier;
+    ofstream fichier;
+    fichier.open("listFichier.txt", ios::out);
+    DIR *dir; struct dirent *diread;
+    vector<char *> files;
+
+    if ((dir = opendir("/home/tomas/Bureau/genieLog/GenieLogicielParser/CORPUS_TRAIN")) != nullptr) {
+        while ((diread = readdir(dir)) != nullptr) {
+            files.push_back(diread->d_name);
+        }
+        closedir (dir);
+    } else {
+        perror ("opendir");
+        return EXIT_FAILURE;
+    }
+
+    for (auto file : files) 
     {
+        tabFichier.push_back(file);
+        fichier << file << "| ";
+    }
+
+    fichier.close();
+    for(int i=0; i < tabFichier.size();i++)
+    {
+        cout<<tabFichier[i] << endl;
+    }
+    cout << "fin du programme"<<"\n";
+
+    return EXIT_SUCCESS;
+}
+
+    
+void option (string s, string resume,string titre,string auteur,string reference,string nomFichier){
+ if (s=="-t"){
+ 	ofstream fichier;
+ 	fichier.open("log.txt");
+ 	
+ 	 fichier << "Le nom du fichier d’origine " << nomFichier << endl;
+ 	
+ 	 fichier << "le titre : " << titre << endl;
+                fichier << "les auteurs : " << auteur << endl;
+                fichier << "le resume : " << resume << endl;
+                fichier << "les references : " << reference << endl;
+                fichier.close();
+                cout << "fin du programme";
+ 
+ 
+ 
+ 
+ 
+ }
+ else if (s=="-x"){
+ 
+ ofstream fichier;
+ fichier.open("log.xml");
+ fichier<< "<article>"<<endl;
+	fichier <<" <preamble> Le nom du fichier "<<nomFichier<<" </preamble>"<<endl;
+	fichier <<"<titre> "<< titre << " </titre>"<<endl;
+	fichier <<"<auteur> La section auteurs et leur adresse"<< auteur<<" </auteur>"<<endl;
+	fichier <<"<abstract> resume article" << resume<< "abstract>" <<endl;
+	fichier <<"<biblio> Les references graphiques papier" <<reference<<"</biblio>" <<endl;
+       fichier <<	"</article> " ;
+ 
+ 
+ 
+ 
+ }
+ }
+     
+ int parseur(string s){
+ 
         ifstream fichier("Boudin-Torres-2006.txt", ios::in);  // on ouvre le fichier en lecture
 
         if (fichier)  // si l'ouverture a réussi
         {
             
             string contenu;  // déclaration d'une chaîne qui contiendra la ligne lue
-            
+            string abstract("Abstract");
             string resume;
             string titre;
             string auteur;
-            char test;
-            int a ;
+            string reference;
+            string nomFichier;
+            int a = 0;
+            
+            nomFichier="Boudin-Torres-2006";
             getline(fichier, contenu);  // on met dans "contenu" la ligne
-            
-            
-            for (a=0;contenu.find_first_not_of("\n") !=  string::npos  && a < 3;a++)
+            /*while (contenu.find("Abstract") == string::npos && a < 1000)
             {
-                if(contenu.find("Florian") == string::npos)
-                {
-                    cout<<"contenu a la recherche du titre : " + contenu <<endl;
-                    titre += contenu;
-                    getline(fichier, contenu);
-                }
-                else
-                {
-                    a=3;    
-                }
-                
-            }
+                auteur += contenu;
+                a++;
+                getline(fichier, contenu);
+            }*/
             
-            //titre = contenu;
-            //getline(fichier, contenu);
+            titre = contenu;
+            getline(fichier, contenu);
             while (contenu.find("Abstract") == string::npos &&  a < 1000)
             {
                 auteur += contenu;
@@ -58,40 +124,47 @@
                     getline(fichier, contenu);
 
                 }
-                fichier.close();  // on ferme le fichier
-
-
-
-
-            }
-
-            if (true)
+                
+                
+                
+                ///////
+                 while (contenu.find("References") == string::npos )
             {
-                ofstream fichier;
-                fichier.open("log.txt", ios::out);
-                fichier << "le titre : " << titre << endl;
-                fichier << "les auteurs : " << auteur << endl;
-                fichier << "le resume : " << resume << endl;
-                fichier.close();
-                cout << "fin du programme"<<"\n";
+           
+                getline(fichier, contenu);
+            }
+            if (contenu.find("References") != string::npos) {
+                getline(fichier, contenu);
+                while (!fichier.eof()) {
+
+                    reference += contenu;
+                    getline(fichier, contenu);
+
+                }
+                }
+                
+                
+                
+                
+                
+                fichier.close();  // on ferme le fichier
+                
+                option(s, resume, titre, auteur,reference ,nomFichier);
+
+
+
+
             }
             
-            
-        }
         else
             cerr << "Impossible d'ouvrir le fichier !" << endl;
 
-        return 0;
+        
     }
-
-
-// Exécuter le programme : Ctrl+F5 ou menu Déboguer > Exécuter sans débogage
-// Déboguer le programme : F5 ou menu Déboguer > Démarrer le débogage
-
-// Astuces pour bien démarrer : 
-//   1. Utilisez la fenêtre Explorateur de solutions pour ajouter des fichiers et les gérer.
-//   2. Utilisez la fenêtre Team Explorer pour vous connecter au contrôle de code source.
-//   3. Utilisez la fenêtre Sortie pour voir la sortie de la génération et d'autres messages.
-//   4. Utilisez la fenêtre Liste d'erreurs pour voir les erreurs.
-//   5. Accédez à Projet > Ajouter un nouvel élément pour créer des fichiers de code, ou à Projet > Ajouter un élément existant pour ajouter des fichiers de code existants au projet.
-//   6. Pour rouvrir ce projet plus tard, accédez à Fichier > Ouvrir > Projet et sélectionnez le fichier .sln.
+    return 0;
+ }
+ int main(){
+    fichierDansDossier();
+ 	parseur("-x");
+ 	return 0;
+ }
