@@ -136,7 +136,7 @@ void option (string s, string resume,string titre,string auteur,string reference
 
                 }
                 
-            while (contenu.find("Conclusions") == string::npos )
+         /*   while (contenu.find("Conclusions") == string::npos )
             {
                 cout << "je suis dans le while de la conclusions";
                 getline(fichier, contenu);
@@ -150,7 +150,7 @@ void option (string s, string resume,string titre,string auteur,string reference
                     getline(fichier, contenu);
 
                 }
-                }
+                }*/
 
 
                 ///////
