@@ -10,9 +10,9 @@ using namespace std;
 using std::cout; using std::cin;
 using std::endl; using std::vector;
     
-int fichierDansDossier()
+char * fichierDansDossier()
 {
-    
+    int chosenOne;
     vector<char *> tabFichier;
     ofstream fichier;
     fichier.open("listFichier.txt", ios::out);
@@ -26,23 +26,28 @@ int fichierDansDossier()
         closedir (dir);
     } else {
         perror ("opendir");
-        return EXIT_FAILURE;
+        return NULL;
     }
 
     for (auto file : files) 
     {
         tabFichier.push_back(file);
-        fichier << file << "| ";
     }
 
     fichier.close();
     for(int i=0; i < tabFichier.size();i++)
     {
-        cout<<tabFichier[i] << endl;
+        cout<<i<<" : "<<tabFichier[i] << endl;
     }
-    cout << "fin du programme"<<"\n";
+    cout << "choose your file by entering the number"<<endl;
+    cin >> chosenOne;
 
-    return EXIT_SUCCESS;
+    if(chosenOne>=0 && chosenOne < tabFichier.size())
+    {
+        cout << "you choose : " << tabFichier[chosenOne] << endl;
+    }
+
+    return tabFichier[chosenOne];
 }
 
     
@@ -83,9 +88,9 @@ void option (string s, string resume,string titre,string auteur,string reference
  }
  }
      
- int parseur(string s){
+ int parseur(string s , char * fileName){
  
-        ifstream fichier("Boudin-Torres-2006.txt", ios::in);  // on ouvre le fichier en lecture
+        ifstream fichier(fileName, ios::in);  // on ouvre le fichier en lecture
 
         if (fichier)  // si l'ouverture a réussi
         {
@@ -99,14 +104,8 @@ void option (string s, string resume,string titre,string auteur,string reference
             string nomFichier;
             int a = 0;
             
-            nomFichier="Boudin-Torres-2006";
+            nomFichier=fileName;
             getline(fichier, contenu);  // on met dans "contenu" la ligne
-            /*while (contenu.find("Abstract") == string::npos && a < 1000)
-            {
-                auteur += contenu;
-                a++;
-                getline(fichier, contenu);
-            }*/
             
             titre = contenu;
             getline(fichier, contenu);
@@ -164,7 +163,7 @@ void option (string s, string resume,string titre,string auteur,string reference
     return 0;
  }
  int main(){
-    fichierDansDossier();
- 	parseur("-x");
+    
+ 	parseur("-t",fichierDansDossier());
  	return 0;
  }
