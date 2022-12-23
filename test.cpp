@@ -16,7 +16,6 @@ char * fichierDansDossier()
     char* fileChosen;
     vector<char *> tabFichier;
     ofstream fichier;
-    fichier.open("listFichier.txt", ios::out);
     DIR *dir; struct dirent *diread;
     vector<char *> files;
 
@@ -83,7 +82,7 @@ void option (string s, string resume,string titre,string auteur,string reference
 	fichier <<" <preamble> Le nom du fichier "<<nomFichier<<" </preamble>"<<endl;
 	fichier <<"<titre> "<< titre << " </titre>"<<endl;
 	fichier <<"<auteur> La section auteurs et leur adresse"<< auteur<<" </auteur>"<<endl;
-	fichier <<"<abstract> resume article" << resume<< "abstract>" <<endl;
+	fichier <<"<abstract> resume article" << resume<< "</abstract>" <<endl;
     fichier <<"<introduction> introduction article" << introduction<< "</introduction>" <<endl;
     fichier <<" <corps> Le corps "<<corps<<" </corps>"<<endl;
     fichier <<" <conclusion> La conclusion "<<conclusion<<" </conclusion>"<<endl;
@@ -99,8 +98,9 @@ void option (string s, string resume,string titre,string auteur,string reference
      
  int parseur(string s , char * fileName){
  
-        ifstream fichier("compression.txt", ios::in);  // on ouvre le fichier en lecture
-
+        ifstream fichier(fileName, ios::in);  // on ouvre le fichier en lecture
+       // cout << fileName<<endl;
+        //cout << fichier<<endl;
         if (fichier)  // si l'ouverture a réussi
         {
             
@@ -122,7 +122,7 @@ void option (string s, string resume,string titre,string auteur,string reference
             
             titre = contenu;
             getline(fichier, contenu);
-            while (contenu.find("Abstract") == string::npos && a < 10)
+            while (contenu.find("Abstract") == string::npos && a < 20)
             {
                 auteur += contenu;
                 a++;
@@ -137,7 +137,7 @@ void option (string s, string resume,string titre,string auteur,string reference
                     getline(fichier, contenu);
 
                 }
-
+            }
             while (contenu.find("Introduction") == string::npos && a < 100)
             {
                 
@@ -183,7 +183,7 @@ void option (string s, string resume,string titre,string auteur,string reference
                 while (contenu.find("Acknowledgments") == string::npos && contenu.find("References") == string::npos)
                 {
                    // cout << "je recupere la conclusion";
-                    conclusion += contenu;
+                    discussion += contenu;
                     getline(fichier, contenu);
 
                 }
@@ -205,28 +205,28 @@ void option (string s, string resume,string titre,string auteur,string reference
                     getline(fichier, contenu);
 
                 }
-                }
-                
-                
-                
-                
-                
-                fichier.close();  // on ferme le fichier
-                
-                option(s, resume, titre, auteur,reference ,nomFichier,conclusion,discussion,introduction,corps);
-
-
-
-
             }
-            
-        else
-            cerr << "Impossible d'ouvrir le fichier !" << endl;
+                
+                
+                
+                
+                
+            fichier.close();  // on ferme le fichier
+                
+            option(s, resume, titre, auteur,reference ,nomFichier,conclusion,discussion,introduction,corps);
+        
 
         
+    
+    
+ 
     }
+    else
+        cerr << "Impossible d'ouvrir le fichier !" << endl;
+
     return 0;
  }
+ 
  int main(){
     
  	parseur("-x",fichierDansDossier());
