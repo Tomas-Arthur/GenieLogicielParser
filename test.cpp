@@ -228,7 +228,9 @@ void option (string s, string resume,string titre,string auteur,string reference
  }
  
  int main(){
-    
- 	parseur("-x",fichierDansDossier());
+    	string s;
+    	cout << "enter '-x' for output in xml and '-t' for output in txt"<<endl;
+   	cin >> s;
+ 	parseur(s,fichierDansDossier());
  	return 0;
  }
